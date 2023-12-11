@@ -110,23 +110,6 @@ def main():
     print('best_obj', best_obj)
     print('Latest Changed Epoch is ', latest_changes)
 
-    results_save_path = os.path.join(logpath, 'Best_results.txt')
-    f = open(results_save_path, 'a')  # 读取label.txt文件，没有则创建，‘a’表示再次写入时不覆盖之前的内容
-    f.write('\n')
-    f.write(str(best_auc)+' Best AUC')
-    f.write('\n')
-    f.write(str(best_hm)+' Best HM')
-    f.write('\n')
-    f.write(str(best_seen)+' Best Seen')
-    f.write('\n')
-    f.write(str(best_unseen)+' Best UnSeen')
-    f.write('\n')
-    f.write(str(best_attr)+' Best Attr')
-    f.write('\n')
-    f.write(str(best_obj)+' Best Objs')
-    f.write('\n')
-    f.write(str(latest_changes)+' Latest_Changes')
-    f.write('\n')
 
 def train_normal(epoch, image_extractor, model, trainloader, optimizer):
     '''
