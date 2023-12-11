@@ -1,6 +1,8 @@
 # IMAX
 Code of Imaginatively-connected Embedding in Complex Space for Unseen Attribute-Object Discrimination (IMAX)
 
+The full code file is in the process of being organized and will be fully open-sourced by December 15th.
+
 ## Datasets
 The splits of dataset and its attributes can be found in utils/download_data.sh, the complete installation process can be found in [CGE] https://github.com/ExplainableML/czsl
 
