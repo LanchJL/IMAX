@@ -11,7 +11,7 @@ conda activate IMAX
 ```
 
 ## Datasets
-The splits of dataset and its attributes can be found in utils/download_data.sh, the complete installation process can be found in [CGE](https://github.com/ExplainableML/czsl).
+The splits of dataset and its attributes can be found in utils/download_data.sh, the complete installation process can be found in [CGE&CompCos](https://github.com/ExplainableML/czsl).
 You can download the datasets using
 ```shell
 bash utils/download_data.sh
@@ -33,3 +33,5 @@ Please specify the path for the trained weights, and than run:
 ```shell
    python test.py --config CONFIG_FILE test_weights_path --WEIGHTS_PATH
 ```
+## Acknowledgements
+Our overall code is built on top of [CGE&CompCos](https://github.com/ExplainableML/czsl), and we sincerely appreciate the great help this work has given us.
