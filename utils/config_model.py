@@ -12,8 +12,6 @@ def configure_model(args, dataset):
     model = IMAX(dataset, args)
     if dataset.open_world and not args.train_only:
         is_open = True
-    else:
-        raise NotImplementedError
 
     model = model.to(device)
 
