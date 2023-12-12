@@ -2,22 +2,16 @@ import torch
 import torch.optim as optim
 
 from models.image_extractor import get_image_extractor
-from models.graph_method import GraphFull
-from models.compcos import CompCos
-from models.ECPS import ECPS
+from models.IMAX import IMAX
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
 def configure_model(args, dataset):
     image_extractor = None
     is_open = False
-
-    if args.model == 'graphfull':
-        model = GraphFull(dataset, args)
-    elif args.model == 'compcos':
-        model = ECPS(dataset, args)
-        if dataset.open_world and not args.train_only:
-            is_open = True
+    model = IMAX(dataset, args)
+    if dataset.open_world and not args.train_only:
+        is_open = True
     else:
         raise NotImplementedError
 
