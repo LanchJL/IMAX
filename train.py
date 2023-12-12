@@ -31,8 +31,7 @@ latest_changes = 0
 compose_switch = True
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-#random_seed = random.randint(0, 10000)
-random_seed = 3407
+random_seed = random.randint(0, 10000)
 random.seed(random_seed)
 torch.manual_seed(random_seed)
 np.random.seed(random_seed)

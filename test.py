@@ -20,12 +20,10 @@ from utils.utils import load_args
 from utils.config_model import configure_model
 from flags import parser
 
-
-
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 def main():
-    log_path = 'logs/mine/cgqa/weights'
+    log_path = ''
     state_dict = os.path.join(log_path,'Best_HM_Embedding.pth')
     # Get arguments and start logging
     args = parser.parse_args()
@@ -42,17 +40,6 @@ def main():
         subset=args.subset,
         open_world=args.open_world
     )
-
-    valset = dset.CompositionDataset(
-        root=os.path.join(DATA_FOLDER,args.data_dir),
-        phase='val',
-        split=args.splitname,
-        model=args.image_extractor,
-        subset=args.subset,
-        update_features=args.update_features,
-        open_world=args.open_world
-    )
-
     testset = dset.CompositionDataset(
         root=os.path.join(DATA_FOLDER,args.data_dir),
         phase='test',
@@ -128,8 +115,6 @@ def test(image_extractor, model, testloader, evaluator,  args, threshold=None, p
         results = evaluator.score_model(all_pred_dict, all_obj_gt, bias=args.bias, topk=args.topk)
         stats = evaluator.evaluate_predictions(results, all_attr_gt, all_obj_gt, all_pair_gt, all_pred_dict,
                                                topk=args.topk)
-
-
         result = ''
         for key in stats:
             result = result + key + '  ' + str(round(stats[key], 4)) + '| '
