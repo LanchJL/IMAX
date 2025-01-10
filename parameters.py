@@ -35,6 +35,4 @@ parser.add_argument('--threshold', type=float, default=None, help="optional thre
 parser.add_argument('--threshold_trials', type=int, default=50, help="how many threshold values to try")
 
 parser.add_argument("--adapter_dim", help="middle dimension of Adapter", type=int, default=64)
-parser.add_argument("--init_lamda", help="lamda initialization value", type=float, default=0.1)
-parser.add_argument("--cmt_layers", help="Number of layers in cross-attention", type=int, default=2)
 parser.add_argument('--adapter', action="store_true", default=False)
