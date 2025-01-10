@@ -29,9 +29,41 @@ bash utils/download_data.sh
 ```
 
 ## Train
-If you wish to try training our model from scratch, for example: 
+If you wish to try training our model from scratch, for example, for ``UT-Zappos``: 
 ```shell
-  sh ./run/utzappos.sh
+python -u train.py \
+--clip_arch ./clip_modules/ViT-L-14.pt \
+--dataset_path ../dataset/CZSL/ut-zap50k \
+--save_path ./save_dir/ut-zappos \
+--yml_path ./config/clip/ut-zappos.yml \
+--num_workers 4 \
+--seed 0 \
+--adapter
+```
+
+``MIT-States``: 
+
+```shell
+python -u train.py \
+--clip_arch ./clip_modules/ViT-L-14.pt \
+--dataset_path ../dataset/CZSL/mit-states \
+--save_path ./save_dir/mit-states \
+--yml_path ./config/clip/mit-states.yml \
+--num_workers 2 \
+--seed 0 \
+--adapter
+```
+
+``C-GQA``:
+```shell
+python -u train.py \
+--clip_arch ./clip_modules/ViT-L-14.pt \
+--dataset_path ../dataset/CZSL/cgqa \
+--save_path ./save_dir/cgqa \
+--yml_path ./config/clip/cgqa.yml \
+--num_workers 2 \
+--seed 0 \
+--adapter
 ```
 
 ## Acknowledgement
