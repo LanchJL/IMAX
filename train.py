@@ -75,7 +75,7 @@ def train_model(model, optimizer, config, train_dataset, val_dataset, test_datas
             torch.save(model.state_dict(), os.path.join(config.save_path, f"epoch_{i}.pt"))
 
         print("Evaluating val dataset:")
-        val_result = evaluate(model, test_dataset, config)
+        val_result = evaluate(model, val_dataset, config)
         val_results.append(val_result)
         print(config.val_metric)
         print("val_result:", val_result)
