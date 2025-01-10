@@ -170,16 +170,7 @@ class CompositionDataset(Dataset):
                 # ignore instances that are not in current split
                 continue
 
-            if 'mit' in self.root:
-                path = os.path.join('../dataset/CZSL/mit-states/images/', image)
-                if os.path.exists(path):
-                    data_i = [image, attr, obj]
-                else:
-                    image = remove_illegal_characters_from_filename(image)
-                    #print(f"Illegal Path: change path to - {image}")
-                    data_i = [image, attr, obj]
-            else:
-                data_i = [image, attr, obj]
+            data_i = [image, attr, obj]
 
             if settype == 'train':
                 train_data.append(data_i)
