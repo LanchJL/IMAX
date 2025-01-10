@@ -20,6 +20,20 @@ The remaining dependencies can be found in the ``./requirements.txt`` file and i
 DINO pretrained VIT-B-16 can be found [Here](https://dl.fbaipublicfiles.com/dino/dino_vitbase16_pretrain/dino_vitbase16_pretrain.pth). Please place the downloaded file in the `./pretrain/`
 
 The CLIP weights can be downloaded via [CLIP](https://openaipublic.azureedge.net/clip/models/b8cca3fd41ae0c99ba7e8951adf17d267cdb84cd88be6f7c2e0eca1737a03836/ViT-L-14.pt) and should be placed in the ./clip_modules directory.
+
+## Datasets
+The splits of dataset and its attributes can be found in utils/download_data.sh, the complete installation process can be found in [CGE&CompCos](https://github.com/ExplainableML/czsl).
+You can download the datasets using
+```shell
+bash utils/download_data.sh
+```
+
+## Train
+If you wish to try training our model from scratch, for example: 
+```shell
+  sh ./run/utzappos.sh
+```
+
 ## Acknowledgement
 The code we publish is based on the following outstanding repositories, which have helped us a lot
 * [DFSP](https://github.com/Forest-art/DFSP)
