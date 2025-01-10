@@ -8,6 +8,14 @@
 
 **[2025.1]** We have completed the open-sourcing of the CLIP-based IMAX code, and the remaining encoder implementations will be uploaded shortly.
 
+## Setup
+```bash
+conda create --name imax python=3.8
+conda activate imax
+conda install pytorch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0 pytorch-cuda=12.1 -c pytorch -c nvidia
+pip3 install git+https://github.com/openai/CLIP.git
+```
+The remaining dependencies can be found in the ``./requirements.txt`` file and installed using `pip install -r requirements.txt`.
 ## Acknowledgement
 The code we publish is based on the following outstanding repositories, which have helped us a lot
 * [DFSP](https://github.com/Forest-art/DFSP)
