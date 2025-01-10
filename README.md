@@ -66,6 +66,11 @@ python -u train.py \
 --adapter
 ```
 
+Or you can run sh files in ``./run/``, for example:
+```shell
+sh ./run/utzappos.sh
+```
+
 ## Acknowledgement
 The code we publish is based on the following outstanding repositories, which have helped us a lot
 * [DFSP](https://github.com/Forest-art/DFSP)
