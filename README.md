@@ -16,6 +16,10 @@ conda install pytorch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0 pytorch-cuda=
 pip3 install git+https://github.com/openai/CLIP.git
 ```
 The remaining dependencies can be found in the ``./requirements.txt`` file and installed using `pip install -r requirements.txt`.
+
+DINO pretrained VIT-B-16 can be found [Here](https://dl.fbaipublicfiles.com/dino/dino_vitbase16_pretrain/dino_vitbase16_pretrain.pth). Please place the downloaded file in the `./pretrain/`
+
+The CLIP weights can be downloaded via [CLIP](https://openaipublic.azureedge.net/clip/models/b8cca3fd41ae0c99ba7e8951adf17d267cdb84cd88be6f7c2e0eca1737a03836/ViT-L-14.pt) and should be placed in the ./clip_modules directory.
 ## Acknowledgement
 The code we publish is based on the following outstanding repositories, which have helped us a lot
 * [DFSP](https://github.com/Forest-art/DFSP)
