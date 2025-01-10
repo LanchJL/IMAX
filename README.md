@@ -4,7 +4,7 @@
 * **Publication Status**: This paper has been accepted for publication in IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI)
 
 # News
-**[2025.1]** To enhance readability, we restructured the IMAX code based on [Troika](https://github.com/bighuang624/Troika?tab=readme-ov-file) and introduced an Adapter module to facilitate the adaptation of the CLIP visual encoder to the test dataset. 
+**[2025.1]** To enhance readability, we restructured the IMAX code based on [Troika](https://github.com/bighuang624/Troika?tab=readme-ov-file) and introduced an Adapter module to facilitate the adaptation of the CLIP visual encoder to the test dataset. We found that this improvement further enhances IMAX's performance across three benchmark datasets.
 
 **[2025.1]** We have completed the open-sourcing of the CLIP-based IMAX code, and the remaining encoder implementations will be uploaded shortly.
 
