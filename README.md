@@ -33,8 +33,8 @@ If you wish to try training our model from scratch, for example, for ``UT-Zappos
 ```shell
 python -u train.py \
 --clip_arch ./clip_modules/ViT-L-14.pt \
---dataset_path ../dataset/CZSL/ut-zap50k \
---save_path ./save_dir/ut-zappos \
+--dataset_path <path_to_UT-Zap50k> \
+--save_path <path_to_logs> \
 --yml_path ./config/clip/ut-zappos.yml \
 --num_workers 4 \
 --seed 0 \
@@ -46,8 +46,8 @@ python -u train.py \
 ```shell
 python -u train.py \
 --clip_arch ./clip_modules/ViT-L-14.pt \
---dataset_path ../dataset/CZSL/mit-states \
---save_path ./save_dir/mit-states \
+--dataset_path <path_to_MIT-States> \
+--save_path <path_to_logs> \
 --yml_path ./config/clip/mit-states.yml \
 --num_workers 2 \
 --seed 0 \
@@ -58,8 +58,8 @@ python -u train.py \
 ```shell
 python -u train.py \
 --clip_arch ./clip_modules/ViT-L-14.pt \
---dataset_path ../dataset/CZSL/cgqa \
---save_path ./save_dir/cgqa \
+--dataset_path <path_to_C-GQA> \
+--save_path <path_to_logs> \
 --yml_path ./config/clip/cgqa.yml \
 --num_workers 2 \
 --seed 0 \
