@@ -71,6 +71,19 @@ Or you can run sh files in ``./run/``, for example:
 sh ./run/utzappos.sh
 ```
 
+## Test
+If you want to test that the trained model is based on existing weights, run the following command:
+```shell
+python -u test.py \
+--clip_arch ./clip_modules/ViT-L-14.pt \
+--dataset_path <path_to_CG-QA> \
+--yml_path <path_to_yml> \
+--num_workers 4 \
+--seed 0 \
+--adapter \
+--load_model <path_to_weights>
+```
+
 ## Acknowledgement
 The code we publish is based on the following outstanding repositories, which have helped us a lot
 * [DFSP](https://github.com/Forest-art/DFSP)
