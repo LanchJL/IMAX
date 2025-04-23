@@ -38,7 +38,7 @@ python -u train.py \
 --clip_arch ./clip_modules/ViT-L-14.pt \
 --dataset_path <path_to_UT-Zap50k> \
 --save_path <path_to_logs> \
---yml_path ./config/clip/ut-zappos.yml \
+--yml_path ./config/ut-zappos.yml \
 --num_workers 4 \
 --seed 0 \
 --adapter
@@ -51,7 +51,7 @@ python -u train.py \
 --clip_arch ./clip_modules/ViT-L-14.pt \
 --dataset_path <path_to_MIT-States> \
 --save_path <path_to_logs> \
---yml_path ./config/clip/mit-states.yml \
+--yml_path ./config/mit-states.yml \
 --num_workers 2 \
 --seed 0 \
 --adapter
@@ -63,7 +63,7 @@ python -u train.py \
 --clip_arch ./clip_modules/ViT-L-14.pt \
 --dataset_path <path_to_C-GQA> \
 --save_path <path_to_logs> \
---yml_path ./config/clip/cgqa.yml \
+--yml_path ./config/cgqa.yml \
 --num_workers 2 \
 --seed 0 \
 --adapter
