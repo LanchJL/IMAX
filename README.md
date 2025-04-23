@@ -74,7 +74,7 @@ sh ./run/utzappos.sh
 ```
 
 ## Test
-Our trained weights can be found in .
+Our trained weights can be found in [here](https://drive.google.com/drive/folders/1v_i9gOuPFD2wewisfyqe8terX9FWQgUE?usp=drive_link).
 If you want to test that the trained model is based on existing weights, run the following command:
 ```shell
 python -u test.py \
