@@ -166,9 +166,19 @@ class CompositionDataset(Dataset):
 
             if attr == 'NA' or (attr,
                                 obj) not in self.pairs or settype == 'NA':
-                # ignore instances with unlabeled attributes
-                # ignore instances that are not in current split
                 continue
+
+            '''
+            Below code can be removed, this line is used to circumvent 
+            our system's inability to effectively 
+            read illegal characters present in the MIT-States filename
+            '''
+            if 'mit' in self.root:
+                path = os.path.join('../../dataset/CZSL/mit-states/images/', image)
+
+                if not os.path.exists(path):
+                    image = remove_illegal_characters_from_filename(image)
+                    print(f"Illegal Path: change path to - {image}")
 
             data_i = [image, attr, obj]
 

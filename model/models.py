@@ -2,14 +2,9 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import numpy as np
 import math
-from functools import reduce
-from operator import mul
-from copy import deepcopy
-from torch.nn.modules.utils import _pair
 from torch.nn.modules.loss import CrossEntropyLoss
-from clip_modules.clip_model import load_clip, QuickGELU
+from clip_modules.clip_model import load_clip
 from clip_modules.tokenization_clip import SimpleTokenizer
 from model.common import *
 
@@ -91,61 +86,6 @@ class Disentangler(nn.Module):
         x = F.dropout(x, training=self.training)
         return x
 
-
-class MulitHeadAttention(nn.Module):
-    def __init__(self, dim, num_heads=8, qkv_bias=False, qk_scale=None, attn_drop=0., proj_drop=0.):
-        super().__init__()
-        self.num_heads = num_heads
-        head_dim = dim // num_heads
-
-        self.scale = qk_scale or head_dim ** -0.5
-
-        self.q_proj = nn.Linear(dim, dim, bias=qkv_bias)
-        self.k_proj = nn.Linear(dim, dim, bias=qkv_bias)
-        self.v_proj = nn.Linear(dim, dim, bias=qkv_bias)
-
-        self.attn_drop = nn.Dropout(attn_drop)
-        self.proj = nn.Linear(dim, dim)
-        self.proj_drop = nn.Dropout(proj_drop)
-
-    def forward(self, q, k, v):
-        B, N, C = q.shape
-        B, M, C = k.shape
-        q = self.q_proj(q).reshape(B, N, self.num_heads, C // self.num_heads).permute(0,2,1,3)
-        k = self.k_proj(k).reshape(B, M, self.num_heads, C // self.num_heads).permute(0,2,1,3)
-        v = self.v_proj(v).reshape(B, M, self.num_heads, C // self.num_heads).permute(0,2,1,3)
-
-        attn = (q @ k.transpose(-2, -1)) * self.scale
-        attn = attn.softmax(dim=-1)
-        attn = self.attn_drop(attn)
-        
-        x = (attn @ v).transpose(1, 2).reshape(B, N, C)
-        x = self.proj(x)
-        x = self.proj_drop(x)
-        return x
-
-
-class CrossAttentionLayer(nn.Module):
-    def __init__(self, d_model, nhead, dropout=0.1,):
-        super().__init__()
-        self.cross_attn = MulitHeadAttention(d_model, nhead, proj_drop=dropout)
-        self.norm = nn.LayerNorm(d_model)
-
-        self.dropout = nn.Dropout(dropout)
-
-        self.mlp = nn.Sequential(
-            nn.Linear(d_model, d_model * 4),
-            QuickGELU(),
-            nn.Dropout(dropout),
-            nn.Linear(d_model * 4, d_model)
-        )
-
-    def forward(self, q, kv):
-        q = q + self.cross_attn(q, kv, kv)
-        q = q + self.dropout(self.mlp(self.norm(q)))
-        return q
-
-
 class SEBlock(nn.Module):
     def __init__(self, emd_dim, reduction_ratio=12):
         super(SEBlock, self).__init__()
@@ -182,7 +122,12 @@ class AGV(nn.Module):
         )
         self.emd_dim = emd_dim
     def forward(self, X_c, x):
-        x = x.permute(0,2,1).view(-1, 768, 16, 16)
+        x = x.permute(0, 2, 1)
+        _, c, hw = x.shape
+        side = int(hw ** 0.5)
+        assert side * side == hw, "Feature map cannot be reshaped into a square"
+        x = x.view(-1, c, side, side)
+
         N, C, H, W = x.size()
         a = self.activation_head(x) #64 300 14 14
         cam = torch.sigmoid(self.bn_head(a))
@@ -207,7 +152,12 @@ class OGA(nn.Module):
         )
     def forward(self, x, p_o, omega, x_agv):
         bs, hw, ch = x.size()
-        x = x.permute(0, 2, 1).view(-1, 768, 16, 16)
+
+        x = x.permute(0, 2, 1)
+        side = int(hw ** 0.5)
+        assert side * side == hw, "Feature map cannot be reshaped into a square"
+        x = x.view(-1, ch, side, side)
+
         barz = self.filter(x).view(bs, -1, hw).permute(0, 2, 1).unsqueeze(0) #128,12
         p_o = p_o.unsqueeze(1).unsqueeze(1)
         B = torch.sqrt(torch.mean((barz - p_o)**2,dim=2)) #12,128,300
@@ -360,6 +310,22 @@ class IMAX(nn.Module):
     def encode_text(self, token_ids, token_tensors=None, enable_pos_emb=False):
         return self.text_encoder(token_ids, token_tensors, enable_pos_emb)
 
+    def encode_text_for_open(self, idx):
+        token_tensors = self.construct_token_tensors(idx)
+        text_features = []
+        for i_element in range(self.token_ids.shape[0]):
+            _text_features, _ = self.encode_text(
+                self.token_ids[i_element],
+                token_tensors[i_element],
+                enable_pos_emb=self.enable_pos_emb,
+            )
+
+            idx_text_features = _text_features / _text_features.norm(
+                dim=-1, keepdim=True
+            )
+            text_features.append(idx_text_features)
+        return text_features
+
     def construct_soft_prompt(self):
         # token_ids indicates the position of [EOS]
         token_ids = self.tokenizer(self.config.prompt_template,
@@ -467,6 +433,52 @@ class IMAX(nn.Module):
                     + weighted_attr_pred * weighted_obj_pred)
         return pair_logits
 
+    def forward_for_open(self, batch, text_feats, idx):
+        text_features = {}
+        batch_features = {}
+
+        batch_img = batch[0].cuda()
+        batch_img, batch_patch = self.encode_image(batch_img.type(self.clip.dtype)) #(32 768), (32, 257, 768)
+        batch_patch = batch_patch / batch_patch.norm(dim = -1, keepdim=True)
+        batch_features['pair'] = batch_img / batch_img.norm(dim = -1, keepdim=True)
+
+        logits = []
+        for stage in ['pair', 'attr', 'obj']:
+            i_element = self.idx_mapping[stage]
+            text_features[stage] = text_feats[i_element]
+
+        logits.append(self.clip.logit_scale.exp() * batch_features['pair'] @ text_features['pair'].t())
+
+        batch_features['obj'] = self.obj_distangler(batch_img, batch_patch)
+        omega = F.softmax(batch_features['obj'] @ text_features['obj'].t() , dim = -1)
+
+        batch_features['attr'] = self.att_distangler(batch_img, batch_patch, text_features['obj'], omega)
+
+        comp_features = torch.cat((batch_features['attr'], batch_features['obj']), dim = -1)
+        comp_features = comp_features / comp_features.norm(dim = -1, keepdim=True)
+        batch_features['composed'] = self.composer(comp_features)
+        batch_features['composed'] = batch_features['composed'] / batch_features['composed'].norm(dim = -1, keepdim=True)
+
+        logits.append(self.clip.logit_scale.exp() * batch_features['attr'] @ text_features['attr'].t())
+        logits.append(self.clip.logit_scale.exp() * batch_features['obj'] @ text_features['obj'].t())
+
+        if self.config.comp_loss_weight or self.config.comp_inference_weight:
+            logits.append(self.clip.logit_scale.exp() * batch_features['composed'] @ text_features['pair'].t())
+        else:
+            logits.append(self.clip.logit_scale.exp() * batch_features['pair'] @ text_features['pair'].t())
+
+        attr_idx, obj_idx = idx[:, 0], idx[:, 1]
+        text_features['attr_pair'], text_features['obj_pair'] = text_features['attr'][attr_idx], text_features['obj'][obj_idx]
+
+        img_r, img_i, text_r, text_i = self.tocomplex_space(batch_features['obj'], batch_features['attr'],
+                                                            text_features['obj_pair'], text_features['attr_pair'])
+
+        real = torch.mm(img_r, text_r.T) + torch.mm(img_i, text_i.T)
+        imagine = torch.mm(img_i, text_r.T) - torch.mm(img_r, text_i.T)
+
+        logits.append(self.clip.logit_scale.exp() * (real - imagine))
+        return logits
+
     def forward(self, batch, idx):
         text_features = {}
         batch_features = {}
@@ -474,7 +486,7 @@ class IMAX(nn.Module):
         batch_img = batch[0].cuda()
         l, _ = idx.shape
         batch_img, batch_patch = self.encode_image(batch_img.type(self.clip.dtype)) #(32 768), (32, 257, 768)
-
+        batch_patch = batch_patch / batch_patch.norm(dim = -1, keepdim=True)
         batch_features['pair'] = batch_img / batch_img.norm(dim = -1, keepdim=True)
 
         token_tensors = self.construct_token_tensors(idx)
